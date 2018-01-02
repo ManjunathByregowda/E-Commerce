@@ -1,0 +1,34 @@
+<div class="container">
+	<div class="col-md-4">
+		<p id="notice"><%= notice %></p>
+
+		<p>
+		  <strong>Name:</strong>
+		  <%= @sub_category.name %>
+		</p>
+
+		<p>
+		  <strong>Category:</strong>
+		  <%= @sub_category.category.name %>
+		</p>
+
+
+		<% if  @sub_category.products.empty? %>
+			<h3> No products found</h3>
+		<% else %>
+			<div class="page-header">
+				<h3> Products belonging to <%= @sub_category.name%> (<%=  @sub_category.products.size %>) </h3>
+			</div>
+			<ul>
+				<%  @sub_category.products.each do |product| %>
+					<li><%= link_to product.name, product_path(product.id) %></li>
+				<% end %>
+			</ul>
+		<% end %>
+
+		<% if user_signed_in? && (current_user.is_admin?)%>
+			<%= link_to 'Edit', edit_sub_category_path(@sub_category) %>
+		<%end%>
+		<%= link_to 'Back', sub_categories_path %>
+	</div>
+</div>

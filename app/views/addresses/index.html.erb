@@ -1,0 +1,46 @@
+<div class="container">
+	<div class="col-md-6">
+		<div class="page-header">
+			<h2> Your Address </h2>
+		</div>
+		<% if @addresses.empty? %>
+			<b> You have No Address to Ship </b>
+		<% else %>
+			<%# if user_signed_in? && current_user.id == @address.user_id %>
+
+				<% @addresses.each do |address|%>
+					<li><%=address.details %> - <%= address.landmark %> - <%= address.city %> - <%= address.state %> - <%=address.pincode %> </li>
+				<% end %>
+		<% end %><br/>
+		<br/>
+		<%# end %>
+	</div>
+	<div class="col-md-4">
+		<div class="page-header">
+			<h2>Add New Address</h2>
+		</div>
+	<%= form_for @address do |f|%>
+
+		<div class="form-group">
+		<label>Details</label><br/>
+		<%= f.text_area :details, class: "form-control" %>
+		</div>
+
+		<div class="form-group">
+		<label>Landmark</label><br/>
+		<%= f.text_field :landmark, class: "form-control" %>
+		<div class="form-group">
+		<label>City</label><br/>
+		<%= f.text_field :city, class: "form-control" %>
+		<div class="form-group">
+		<label>State</label><br/>
+		<%= f.text_field :state, class: "form-control" %>
+		<div class="form-group">
+		<label>Pincode</label><br/>
+		<%= f.text_field :pincode, class: "form-control" %><br/>
+
+		<%= f.submit "submit", class: "btn btn-primary" %>
+
+	<% end %>
+</div>
+</div>

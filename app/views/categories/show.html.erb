@@ -1,0 +1,25 @@
+<div class="container">
+	<div class="col-md-6">
+		<div class="page-header">
+			<h2><%= @category.name%></h2>
+		</div>
+
+			<% if user_signed_in? && (current_user.is_admin?)%>
+				<%= link_to "edit",edit_category_path(@category.id) %> |<%= link_to "destroy",category_path(@category.id),method: :delete, data: {confirm: "are you sure"} %>
+			<%end%>
+
+
+			<%if @category.sub_categories.empty?%>
+				<h3> No products found</h3>
+			<%else%>
+				<h3> Sub Categories belonging to <%=@category.name%> (<%= @category.sub_categories.size %>) </h3>
+				<ul>
+					<% @category.sub_categories.each do |subcategory| %>
+						<li><%= link_to subcategory.name, sub_category_path(subcategory.id) %></li>
+					<% end %>
+				</ul>
+			<%end%>
+
+			<% link_to "back", :back %>
+		</div>
+	</div>

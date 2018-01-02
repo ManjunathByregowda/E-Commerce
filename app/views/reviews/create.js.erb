@@ -1,0 +1,8 @@
+<% if @review.errors.any? %>
+	$('#formError').html("<%= @review.errors.full_messages.join(", ") %>");
+<% else %>
+	$('#formError').hide();
+	$('#reviewList').append("<%= escape_javascript render('review') %>");
+	//$('#new_review')[0].reset();
+	document.getElementById('new_review').reset();
+<% end %>

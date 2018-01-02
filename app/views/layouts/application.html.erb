@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ecommerce</title>
+  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= csrf_meta_tags %>
+   <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</head>
+</head>
+<body>
+
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand">E-commerce</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="/categories">Categories</a></li>
+        <li><%= link_to "Products", products_path %></li>
+        <li><%= link_to "Sub category", sub_categories_path%></li>
+        <% if user_signed_in? && (current_user.is_admin?)%>
+        	<li><%= link_to "Add Tax", new_tax_path %></li>
+        <%end%>
+        <% if user_signed_in? %>
+	        <li class="dropdown">
+	          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><%= current_user.username %><span class="caret"></span></a>
+	          <ul class="dropdown-menu">
+	            <li><%= link_to "Your cart (#{current_user.cart_line_items.pluck(:quantity).inject(:+)})", cart_line_items_path %></li>
+	            <li><%= link_to "your Orders",orders_path %></li>
+	          </ul>
+	        </li>
+	    <%end%>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <% if !user_signed_in? %>
+        	<li><%= link_to  new_user_session_path do %>
+        		<i class="glyphicon glyphicon-log-in"></i> Sign in
+        		<%end%>
+        	</li>
+            <li><%= link_to "Sign Up", new_user_registration_path %></li>
+        <%else%>
+        	<li><%= link_to "Add Address", addresses_path %></li>
+        <%end%>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="glyphicon glyphicon-user"></i><span class="caret"></span></a>
+          <ul class="dropdown-menu">
+          	<% if user_signed_in? %>
+            	<li><%= link_to  edit_user_registration_path do %>
+	            		<i class="glyphicon glyphicon-cog"></i> Account Setting
+	            	<%end%>
+	            </li>
+            	<li><%= link_to  destroy_user_session_path, method: :delete do %>
+            			<i class="glyphicon glyphicon-log-out"></i>  Log Out
+            		<%end%>
+            	</li>
+            <%else%>
+	            	<li><%= link_to  new_user_session_path do %>
+        				<i class="glyphicon glyphicon-log-in"></i> Log in
+        			<%end%></li>
+            		<li><%= link_to "Register", new_user_registration_path %></li>
+            <%end%>
+          </ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<p class="notice"><%= notice %></p>
+<p class="alert"><%= alert %></p>
+
+<%= yield %>
+
+</body>
+</html>

@@ -1,0 +1,47 @@
+<div class="container">
+	<div class="col-md-6">
+	<div class="page-header">
+		<h2> Your Orders </h2>
+	</div>
+
+	<% if @orders.empty? %>
+		<p>You have not placed any orders with us. </p>
+	<% else %>
+		<ul>
+			<% @orders.each do |order| %>
+				<li> <%= order.order_date %> - <%= order.order_number %> - <%=order.total %>
+					
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Price</th>
+								<th>Qantity</th>
+								<th>Total Price</th>
+							</tr>
+						</thead>
+						<tbody>
+							<%order.order_line_items.each do |order_line_item| %>
+								<ol>
+									<tr>
+										<td><%= order_line_item.product.name %></td>
+										<td><%= order_line_item.price %></td>
+										<td><%= order_line_item.quantity %></td>
+										<td><%= order_line_item.price * order_line_item.quantity %></td>
+									</tr>
+								</ol>
+							<% end %>
+						</tbody>
+					</table>
+					
+				</li>
+			<% end %>
+		</ul>
+	<% end%>
+</div>
+</div>
+
+
+
+
+							

@@ -1,0 +1,47 @@
+<div class="container">
+	<div class="col-md-4">
+		<%= form_for @category do |f| %>
+
+			<label>Name</label><br/>
+			<%= f.text_field :name, class: "form-control" %>
+			<span id="name"></span><br/> 
+
+			<%= f.submit "Add Category", class: "btn btn-primary" %>
+
+		<% end %>
+	</div>
+</div>
+<!-- <script>
+	var nameHandle = document.getElementById('category_name');
+
+	var nameMsgHandle = document.getElementById('name');
+	var registerForm = document.getElementById('new_category');
+
+	var nameFormat = /^[a-zA-Z]+$/;
+
+	var errors = {
+		name: false
+	}
+
+	function validateName(){
+		if(nameHandle.value == ""){
+			nameMsgHandle.innerHTML = "can't be blank";
+			errors.name = false;
+		}else if(!nameFormat.test(nameHandle.value)){
+			nameMsgHandle.innerHTML = "Should contain only alphabets"
+			errors.name = false;
+		}else if(nameHandle.value.length < 5){
+			nameMsgHandle.innerHTML = "Should be more than 5 character";
+			errors.name = false;
+		}else{
+			nameMsgHandle.innerHTML = "";
+			errors.name = true;
+		}
+	}
+
+	registerForm.addEventListener('submit',function(e){
+		validateName();
+		Object.values(errors).includes(false);
+		e.preventDefault();
+	},false);
+</script> -->

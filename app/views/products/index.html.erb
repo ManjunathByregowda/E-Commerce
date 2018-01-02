@@ -1,0 +1,333 @@
+
+<!-- <%= form_for @product do |f|%>
+	<b><label>Select Categories</label></b><br/>
+	<%= f.collection_check_boxes :category_id, Category.all, :id, :name %><br/><br/>
+
+	<b><label>Cod Eligibles</label></b><br/>
+	<%= f.check_box :cod_eligible %><br/><br/>
+
+	<b><label>Price:</label></b><br/>
+	<a href ="#" id="less_100">Less than100</a> |
+	<a href="#" id="100_to_500">100 to 500 </a> |
+	<a href="#" id="500_more"> 500+ </a><br/><br/>
+
+	<b><input type="range" name="points" min="0" max="10"></b><br/>
+	<input type="range" name="amountRange" min="0" max="20" value="0" oninput="this.form.amountInput.value=this.value" ><br/>
+
+	<b><label>Search</label></b><br/>
+	<%= f.text_field :name, prompt: "search your product"%><br/>
+
+<%end%> -->
+<div class="container">
+	<div class="col-md-6">
+		<div class="page-header">
+			<h1 >Listing Products <small><%#= @products.length %></small> </h1>
+		</div>
+
+			<div id="categories">
+				 <% Category.all.each do |category| %>
+				 	<%#= radio_button_tag "category", category.id %> 
+				 	<%= check_box_tag category.name, category.id %>
+				 	<label for="<%= category.name %>"> <%= category.name %> </label>
+				 <% end %>
+			</div><br/>
+
+			<input type="checkbox" id="cod" > COD ELIGIBLE <br/><br/>
+
+			<input type="text" placeholder="search" id="search"><br/><br/>
+
+			<div id="low_to_high">Low to High</div> 
+			<div id="high_to_low">High to Low </div>
+
+
+<!-- <span id="allProducts"></span>
+<span id="costs"></span> -->
+
+<%= will_paginate @products %>
+
+
+
+ <table id="productsList" class="table" >
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Price</th>
+			<th>Stock</th>
+		</tr>
+	</thead>
+	<tbody >
+	<% @products.each.with_index do |product,index| %>
+		<tr>
+
+			<td><%= link_to product.name, product_path(product.id) %></td>
+			<td><%= product.price %></td>
+			<td><%= product.stock %></td>
+		</tr>
+	<% end %>
+	</tbody>
+</table><br/>
+
+<% if user_signed_in? && current_user.is_admin %>
+	<%= link_to "Add Products", new_product_path, class: "btn btn-primary" %> 
+<% end %>
+</div>
+</div>
+
+ 
+<!-- <script>
+
+	var codHandle= document.getElementById('product_cod_eligible');
+	var productsHandle = document.getElementById('allProducts');
+	var searchHandle = document.getElementById('product_name');
+	var priceHandle = document.getElementById('less_100');
+	var priceHandle1 = document.getElementById('100_to_500');
+	var priceHandle2 = document.getElementById('500_more'); 
+	var finalHandles = document.getElementById('costs');
+
+	codHandle.addEventListener('click',function(){
+		var xhr = new XMLHttpRequest();
+
+		var cod = function(){
+			if(codHandle.value == 1){
+				return "t";
+			}else{
+				return "";
+			}
+
+		}
+		xhr.open('GET', '../products/check_cod_eligible?cod_eligible=' + cod());
+
+		xhr.onreadystatechange = function(){
+			if(xhr.readyState == 4 && xhr.status ==200){
+				var results = JSON.parse(xhr.responseText);
+				console.log(results);
+
+				productsHandle.innerHTML = ""
+
+				results.forEach(function(result){
+  					var option = document.createElement('li');
+  
+
+  					var text = document.createTextNode(result.name);
+  					option.appendChild(text);
+  					console.log(option);
+
+  					productsHandle.appendChild(option);
+  				});
+			}
+
+		}
+		xhr.send();
+	},false);
+
+	searchHandle.addEventListener('keydown',function(){
+		var xhr = new XMLHttpRequest();
+		console.log(searchHandle.value);
+		xhr.open('GET', '../products/check_by_search?name=' + searchHandle.value);
+
+		xhr.onreadystatechange = function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+
+				var results = JSON.parse(xhr.responseText);
+				console.log(results);
+
+				results.forEach(function(result){
+					var text = result.name;
+
+					// var value = text.includes("searchHandle.value");
+					// console.log(value)
+				})
+			}
+		}
+
+		xhr.send();
+
+	},false);
+
+	priceHandle.addEventListener('click',function(){
+		var url= `http://localhost:3000/products/By_price_less_than_100`;
+		var xhr = new XMLHttpRequest();
+			xhr.open('GET', url);
+			xhr.onreadystatechange = function()
+			{
+				if(xhr.readyState == 4 && xhr.status == 200)
+				{
+					var results = JSON.parse(xhr.responseText);
+					console.log(results)
+
+					finalHandles.innerHTML = "";
+
+					
+					results.forEach(function(result){
+	  					var option = document.createElement('li');
+	  
+
+	  					var text = document.createTextNode(result.name);
+	  					option.appendChild(text);
+	  					console.log(option);
+
+	  					finalHandles.appendChild(option);
+	  				});
+				}
+			}
+		xhr.send();
+	},false);
+
+	priceHandle1.addEventListener('click',function(){
+		var url= `http://localhost:3000/products/By_price_between_100_to_500`;
+		var xhr = new XMLHttpRequest();
+			xhr.open('GET', url);
+			xhr.onreadystatechange = function()
+			{
+				if(xhr.readyState == 4 && xhr.status ==200)
+				{
+					
+
+					var results = JSON.parse(xhr.responseText);
+
+					finalHandles.innerHTML = "";
+
+					results.forEach(function(result)
+					{
+	  					var option = document.createElement('li');  
+						var txt = document.createTextNode(result.name);  
+						option.appendChild(txt);
+						console.log(option);
+						finalHandles.appendChild(option);
+
+	  				});
+				}
+
+			}
+		xhr.send();
+	},false);
+
+	priceHandle2.addEventListener('click',function(){
+		var url= `http://localhost:3000/products/By_price_greater_than_500`;
+		var xhr = new XMLHttpRequest();
+			xhr.open('GET', url);
+			xhr.onreadystatechange = function()
+			{
+				if(xhr.readyState == 4 && xhr.status == 200)
+				{
+					var results = JSON.parse(xhr.responseText);
+					//console.log(results.length);
+
+					finalHandles.innerHTML = "";
+
+					results.forEach(function(result){
+						var option = document.createElement('li'); 
+						var txt = document.createTextNode(result.name);  
+						option.appendChild(txt);
+						console.log(option);  
+						finalHandles.appendChild(option);
+					});
+				}
+			}
+		xhr.send();
+	},false);
+
+
+</script> -->
+
+
+<script>
+	var categoriesHandle = document.getElementById('categories');
+	var categoryInputs = categoriesHandle.getElementsByTagName('input');
+	var productsListHandle = document.getElementById('productsList');
+
+	var searchHandle = document.getElementById('search');
+
+	var codHandle = document.getElementById('cod');
+
+	var lowHandle = document.getElementById('low_to_high');
+	var highHandle = document.getElementById('high_to_low');
+
+	function buildProductHtml(products){
+		productsList.innerHTML = "";
+		products.forEach(function(product){
+			var li = document.createElement('li');
+			var a = document.createElement('a');
+			var href = document.createAttribute('href');
+			href.value = `/products/${product.id}`;
+			a.setAttributeNode(href);
+			var text = document.createTextNode(product.name);
+			a.appendChild(text);
+			li.appendChild(a);
+			console.log(li);
+			productsList.appendChild(li);
+		});
+	}
+
+	categoriesHandle.addEventListener('click', function(){
+		var categorySelected = [];
+		for(var i = 0; i < categoryInputs.length; i++){
+			if(categoryInputs[i].checked){
+				categorySelected.push(categoryInputs[i].value);
+			}
+		}
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', '../ajax/find_by_categories?category_ids=' + categorySelected.join(","));
+		xhr.onreadystatechange = function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				buildProductHtml(JSON.parse(xhr.responseText));
+			}
+		}
+		xhr.send();
+	}, false);
+
+	searchHandle.addEventListener('keyup', function(){
+			if(searchHandle.value.length >= 3){
+				var xhr = new XMLHttpRequest();
+				xhr.open('GET', '../ajax/autocomplete?search=' + searchHandle.value);	
+				xhr.onreadystatechange = function(){
+					if(xhr.readyState == 4 && xhr.status == 200){
+						buildProductHtml(JSON.parse(xhr.responseText));
+					}
+				}
+				xhr.send()
+			}else if(searchHandle.value == ""){
+				var xhr = new XMLHttpRequest();
+				xhr.open('GET', '../ajax/autocomplete?search=');	
+				xhr.onreadystatechange = function(){
+					if(xhr.readyState == 4 && xhr.status == 200){
+						buildProductHtml(JSON.parse(xhr.responseText));
+					}
+				}
+				xhr.send()
+			} 
+	}, false);
+
+	codHandle.addEventListener('click', function(){
+			var xhr = new XMLHttpRequest();
+			xhr.open('GET', '../ajax/cod_eligible?cod=' + codHandle.checked);
+			xhr.onreadystatechange = function(){
+				if(xhr.readyState == 4 && xhr.status == 200){
+						buildProductHtml(JSON.parse(xhr.responseText));
+				}
+			}
+			xhr.send()
+	}, false);
+
+	lowHandle.addEventListener('click',function(){
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', '../ajax/low_to_high');
+		xhr.onreadystatechange = function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				buildProductHtml(JSON.parse(xhr.responseText));
+			}
+		}
+		xhr.send()
+	},false);
+
+	highHandle.addEventListener('click',function(){
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', '../ajax/high_to_low');
+		xhr.onreadystatechange = function(){
+			if(xhr.readyState == 4 && xhr.status == 200){
+				buildProductHtml(JSON.parse(xhr.responseText));
+			}
+		}
+		xhr.send()
+	},false);
+</script>

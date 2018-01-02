@@ -1,0 +1,162 @@
+<div class="container">
+	<div class=row>
+		<div class="col-md-6">
+			<div class="page-header">
+				<h2><%= @product.name %> - <%= @product.code %></h2>
+			</div>
+			<p> INR <%= @product.price%></p>
+			<p> Category - <%= link_to @product.category.name, category_path(@product.category_id)%> </p>
+			<p> Description - <%= @product.description %> </p>
+			<% if @product.stock > 0 %>
+				<h4 style="color:green"> In Stock </h4>
+			<% else %>
+				<p style="color:red"> Currently unavalible</p>
+			<% end %>
+			<% if user_signed_in? && current_user.is_admin %>
+				<%= link_to "edit",edit_product_path(@product.id) %> |<%= link_to "destroy",product_path(@product.id),method: :delete, data: {confirm: "are you sure"} %>
+			<% end %>
+		</div>
+		<div class="col-md-6">
+			<%#= image_tag(@product.image_url) %>
+			<img src="<%=@product.image_url %>" style="width:250px;height:250px;">
+			<!-- <img src="\bat.jpeg" width="240" height="240"> -->
+		</div>
+	</div>
+
+	<div class=row>
+		<div class="col-md-4">
+			<div class="page-header">
+				<h2> Add Review </h2>
+			</div>
+
+			<span id="formError">
+				
+			</span>
+			<% if user_signed_in? %>
+				<%= form_for(@review, remote: true) do |f| %>
+
+					<%= f.hidden_field :product_id, value:@product.id %>
+
+					<label>Title</label><br/>
+					<%= f.text_field :title, class: "form-control" %>
+					<span id="title"></span><br/>
+
+					<label>Description</label><br/>
+					<%=f.text_field :description, class: "form-control" %>
+					<span id="description"></span><br/> 
+
+					<label>Rating : </label><br/>
+					<%=f.radio_button :rating, 1 %> 1
+					<%=f.radio_button :rating, 2 %> 2
+					<%=f.radio_button :rating, 3 %> 3
+					<%=f.radio_button :rating, 4 %> 4
+					<%=f.radio_button :rating, 5 %> 5
+					<span id="rating"></span><br/><br/>
+
+					<%= f.submit "Add Review", class: "btn btn-primary" %>
+				<% end %>
+			<%else%>
+				<b>You need to register for Review.</b>
+				<%= link_to "login", new_user_session_path%><br/>
+			<%end%>
+		</div>
+
+		<div class="col-md-4">
+		</div>
+
+		<div class="col-md-4">
+			<div class="page-header">
+				<h2>Listing Reviews - <span id="count"></span></h2>
+			</div>
+			<!-- Review.where('product_id = ?', @product.id) -->
+			<% if @product.reviews.empty? %>
+				<b>No reviews found. be the first to add a review.</b>
+			<% else %>
+				
+				<ul id="reviewList">
+					<% @product.reviews.each do |review|%>
+						<li id="review_<%= review.id %>"><%= review.title %> - <%= review.rating %>
+							<% if user_signed_in? && (review.user_id == current_user.id || current_user.is_admin)%>
+					<%= link_to "remove", review_path(review.id), method: :delete, data: {confirm: "are you sure"} %>
+				<% end %>
+						</li>
+					<% end %>
+				</ul>
+			<% end %>
+		</div>
+	</div>
+
+
+	<div class="col-md-4">
+		<div class="page-header">
+			<h2>Buy Now</h2>
+		</div>
+		<% if user_signed_in? %>
+			<%= form_for @cart_line_item do |f|%>
+				<%= f.hidden_field :product_id, value: @product.id %>
+				<%= f.label :quantity %> 
+				<%= f.select :quantity, (1..10).to_a %> <br/><br/>
+				<%= f.submit "Add to cart", class: "btn btn-primary" %>
+			<% end %>
+		<%else%>
+			<b>You need to register before buying.</b>
+			<%= link_to "login", new_user_session_path%><br/>
+		<%end%>
+		<%= link_to "back", :back %>
+	</div>
+
+	
+</div>
+
+<script>
+	var titleHandle = document.getElementById('review_title');
+	var descriptionHandle = document.getElementById('review_description');
+	var registerFormHandle = document.getElementById('new_review');
+
+	var titleMsgHandle = document.getElementById('title');
+	var descriptionMsgHandle = document.getElementById('description');
+
+	var errors = {
+		title: false,
+		description: false
+	}
+
+	function validateTitle(){
+		if(titleHandle.value == ""){
+			titleMsgHandle.innerHTML = "can't be blank";
+			errors.title = false;
+		}else if(titleHandle.value.length < 5){
+			titleMsgHandle.innerHTML = "Should be more than 5 characters";
+			errors.title = false;
+		}else{
+			titleMsgHandle.innerHTML = "";
+			errors.title = true;
+		}
+	}
+
+	function validateDescription(){
+		if(descriptionHandle.value == ""){
+			descriptionMsgHandle.innerHTML = "can't be blank";
+			errors.description = false;
+		}else if(descriptionHandle.value.length < 15){
+			descriptionMsgHandle.innerHTML = "Should be more than 20 characters";
+			errors.description = false;
+		}else{
+			descriptionMsgHandle.innerHTML="";
+			errors.description = true;
+		}
+
+	}
+
+	registerFormHandle.addEventListener('submit',function(e){
+		validateTitle();
+		validateDescription();
+
+		if(Object.values(errors).includes(false)){
+			e.preventDefault();
+		}
+	},false);
+
+</script>
+
+

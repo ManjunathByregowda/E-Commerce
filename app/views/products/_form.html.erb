@@ -1,0 +1,279 @@
+<div class="container">
+	<div class="col-md-4">
+		<%= form_for @product do |f| %>
+
+			<% if @product.errors.any? %>
+				<h3>These are validations failed: </h3>
+				<ul>
+					<% @product.errors. full_messages.each do |msg| %>
+						<li><%= msg %></li>
+					<% end %>
+				</ul>
+			<% end %>
+
+			<label>Category</label><br/>
+			<%= f.collection_select :category_id, Category.all, :id, :name, {prompt: "Select"}, {class: "form-control"} %> <br/>
+
+			<label>Sub Category</label><br/>
+			<%= f.collection_select :sub_category_id, [], :id, :name, {prompt: "Select"}, {class: "form-control"}%><br/>
+
+			<label>Name</label><br/>
+			<%= f.text_field :name, class: "form-control" %> 
+			<span id="nameMsg"></span>
+			<br/>
+
+			<label>Price</label><br/>
+			<%= f.text_field :price, class: "form-control" %> 
+			<span id="priceMsg"></span>
+			<br/>
+
+			<label>GST</label><br/>
+			<%= f.collection_select :tax_id, Tax.all, :value, :name, {prompt: "Select %"}, {class: "form-control"} %>
+			<span id="gst"></span><br/> 
+
+			<lable>Net Price</lable><br/>
+			<%= f.text_field :net_price, class: "form-control" %>
+			<span id="netPrice"></span><br/>
+
+			<label>Description</label><br/>
+			<%= f.text_area :description, class: "form-control" %>
+			<span id="description"></span> <br/>
+
+
+			<label>Stock</label><br/>
+			<%= f.text_field :stock, class: "form-control" %>
+			<span id="stock"></span> <br/>
+
+			<label>Release Date Time</label><br/>
+			<%= f.datetime_select :release_datetime, class: "form-control" %>
+			<span id="release"></span> <br/>
+
+			<label>Cod Eligible</label><br/>
+			<%= f.check_box :cod_eligible%>
+			<span id="cod"></span> <br/>
+
+			<label>Image URL</label><br/>
+			<%= f.text_field :image_url, class: "form-control" %>
+			<span id="image"></span> <br/>
+
+			<%= f.submit "Submit", class: "btn btn-primary" %>
+
+		<% end %>
+	</div>
+</div>
+
+<script>
+	var nameHandle = document.getElementById('product_name');
+	var priceHandle = document.getElementById('product_price');
+	var descriptionHandle = document.getElementById('product_description');
+	var stockHandle = document.getElementById('product_stock');
+	var releaseDateHandle = document.getElementById('product_');
+	var codEligibleHandle = document.getElementById('product_cod_eligible');
+	var imageHandle = document.getElementById('product_image_url');
+	var productForm = document.getElementById('new_product');
+	var gstHandle = document.getElementById('product_tax_id');
+	var netPriceHadle = document.getElementById('product_net_price');
+	document.getElementById('product_net_price').disabled = true;
+
+	var categoryHandle = document.querySelector('#product_category_id');
+	var subCategoryHandle = document.querySelector('#product_sub_category_id');
+
+
+	var nameMsgHandle = document.getElementById('nameMsg');
+	var priceMsgHandle = document.getElementById('priceMsg');
+	var descriptionMsgHandle = document.getElementById('description');
+	var stockMsgHandle = document.getElementById('stock');
+	var releaseDateMsgHandle = document.getElementById('release');
+	var codEligibleMsgHandle = document.getElementById('cod');
+	var imageMsgHandle = document.getElementById('image');
+	var gstMsgHandle = document.getElementById('gst');
+	var netPriceMsgHadle = document.getElementById('netPrice');
+
+
+	var nameFormatter = /^[a-zA-Z ]*$/;
+	var priceFormatter = /^[0-9]*(?:\.\d{1,2})?$/;
+	var nameFormat = /^[a-zA-Z]+$/; 
+  	var numberFormat = /^[0-9]*$/;
+
+  	var errors = {
+  		name: false,
+  		price: false,
+  		description: false,
+  		stock: false,
+  		// codEligible: false,
+  		image: false
+  	};
+
+  	categoryHandle.addEventListener('change',function(){
+  		if(categoryHandle.value !== ""){
+  			var xhr = new XMLHttpRequest();
+  			xhr.open('GET', '../categories/find_sub_categories?category_id=' + categoryHandle.value);
+  			xhr.onreadystatechange = function(){
+  				if (xhr.readyState == 4 && xhr.status == 200){
+  					var subCategories = JSON.parse(xhr.responseText);
+
+  					console.log(subCategories);
+
+  					subCategoryHandle.innerHTML = "";
+
+  					subCategories.forEach(function(subCategory){
+  						var option = document.createElement('option');
+  						var optValue = document.createAttribute('value');
+  						optValue.value = subCategory.id
+  						option.setAttributeNode(optValue);
+
+  						var text = document.createTextNode(subCategory.name);
+  						option.appendChild(text);
+
+  						subCategoryHandle.appendChild(option);
+  					});
+  				}
+  			}
+  			xhr.send();
+  		}
+  	},false);
+	// nameHandle.addEventListener('blur',function(){
+	// 	if(nameHandle.value == ""){
+	// 		nameMsgHandle.innerHTML = "Can't be blank";
+	// 	}else if (!nameformatter.test(nameHandle.value)){
+	// 		nameMsgHandle.innerHTML = "Should contain only alphabets";
+	// 	}else{
+	// 		nameMsgHandle.innerHTML = "";
+	// 	}
+	// },false); 
+	// priceHandle.addEventListener('blur',function(){
+	// 	if(priceHandle.value ==""){
+	// 		priceMsgHandle.innerHTML = "can't be blank";
+	// 	}else if (!priceFormatter.test(priceHandle.value)){
+	// 		priceMsgHandle.innerHTML = "should contain only number";
+	// 	}else if (priceHandle.value <= 0){
+	// 		priceMsgHandle.innerHTML = "should be greater than 0";
+	// 	}else {
+	// 		priceMsgHandle.innerHTML = "";
+	// 	}
+	// },false);
+
+	function validateName(){
+		if(nameHandle.value == ""){
+			nameMsgHandle.innerHTML = "Can't be blank";
+			errors.name = false;
+		}else if(!nameFormat.test(nameHandle.value)){
+			nameMsgHandle.innerHTML = "Should contain only alphabets";
+			errors.name = false;
+		}else if(nameHandle.value.length < 5){
+			nameMsgHandle.innerHTML = "Should contain more than 5 character"
+			errors.name = false;
+		}else{
+			nameMsgHandle.innerHTML = "";
+			errors.name = true;
+		}
+	}
+
+	function validatePrice(){
+		if(priceHandle.value ==""){
+			priceMsgHandle.innerHTML = "can't be blank";
+			errors.price = false;
+		}else if (priceHandle.value <= 0){
+			priceMsgHandle.innerHTML = "should be greater than 0";
+			errors.price = false;
+		}else if (!numberFormat.test(priceHandle.value)){
+			priceMsgHandle.innerHTML = "should contain only number";
+			errors.price = false;
+		}else {
+			priceMsgHandle.innerHTML = "";
+			errors.price = true;
+		}
+	}
+
+	function validateDescrition(){
+		if(descriptionHandle.value ==""){
+			descriptionMsgHandle.innerHTML = "can't be blank";
+			errors.description = false;
+		}else if(descriptionHandle.value.length <= 5 ){
+			descriptionMsgHandle.innerHTML = "Description should be 5 character long";
+			errors.description = false;
+		}else{
+			descriptionMsgHandle.innerHTML = "";
+			errors.description = true;
+		}
+	}
+
+	function validateStock(){
+		if(stockHandle.value == ""){
+			stockMsgHandle.innerHTML = "can't be blank";
+			errors.stock = false;
+		}else if(stockHandle.value < 0){
+			stockMsgHandle.innerHTML = "It should be greater than zero";
+			errors.stock = false;
+		}else if(!numberFormat.test(stockHandle.value)){
+			stockMsgHandle.innerHTML = "it should contain only numbers";
+			errors.stock = false;		
+		}else{
+			stockMsgHandle.innerHTML ="";
+			errors.stock = true;
+		}
+	}
+
+	// function validateCod(){
+	// 	if(codEligibleHandle.checked){
+	// 		if(priceHandle.value = ""){
+	// 			codEligibleMsgHandle.innerHTML = "Price can't blank";
+	// 			errors.codEligible = false;
+	// 		}else if(priceHandle.value >= 25000){
+	// 			codEligibleMsgHandle.innerHTML = "products below 25000 are only eligible";
+	// 			errors.codEligible = false;
+	// 		}
+	// 	errors.codEligible = true;
+	// 	}
+	// }
+
+	function validateImage(){
+		if(imageHandle.value == ""){
+			imageMsgHandle.innerHTML = "can't be blank";
+			errors.image = false;
+		}else{
+			imageMsgHandle.innerHTML = "";
+			errors.image = true;
+		}
+	}
+	priceHandle.addEventListener('blur',function(){
+		if((priceHandle.value !== "")&&(priceHandle.value <= 10000)){
+			codEligibleHandle.checked = true;
+			codEligibleHandle.disabled = false;
+		}else{
+			codEligibleHandle.checked = false;
+			codEligibleHandle.disabled = true;
+		}
+	},false);
+
+	gstHandle.addEventListener('change',function(){
+		if(gstHandle.value == ""){
+			netPriceHadle.value = "";
+		}else{
+		netPriceHadle.value = Number(priceHandle.value) + (Number(priceHandle.value * gstHandle.value)/100);
+		}
+	},false);
+
+	priceHandle.addEventListener('change',function(){
+		if(gstHandle.value == ""){
+			netPriceHadle.value = "";
+		}else{
+		netPriceHadle.value = Number(priceHandle.value) + (Number(priceHandle.value * gstHandle.value)/100);
+		}
+	},false);
+
+	productForm.addEventListener('submit',function(e){
+		validateName();
+		validatePrice();
+		validateDescrition();
+		validateStock();
+		// validateCod();
+		validateImage();
+		if(Object.values(errors).includes(false)){
+        e.preventDefault();
+
+      }
+	},false);
+
+
+</script>

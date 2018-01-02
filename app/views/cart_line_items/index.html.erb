@@ -1,0 +1,72 @@
+<%# total = 0
+	@cart_line_items.each do |cart_line_item|
+		total += cart_line_item.quantity
+	end
+%>
+<div class="container">
+	<div class="row">
+	<div class="col-md-4">
+	<div class="page-header">
+		<h3>Your Cart has (<%= @cart_line_items.pluck(:quantity).inject(:+) %> items)</h3>
+	</div>
+		<% if @cart_line_items.empty? %>
+			<p>No products in your cart</p>
+		<% else %>
+		<% sum = 0 %>
+		<table class="table">
+			<thead>
+				<tr>
+					<th> # </th>
+					<th> Name </th>
+					<th> Price </th>
+					<th> Quantity </th>
+					<th> Total </th>
+					<th> Action </th>
+				</tr>
+			</thead>
+			<tbody>
+				<% @cart_line_items.each_with_index do |cart_line_item, index| %>
+				<tr>
+					<td><%= index + 1 %></td>
+					<td><%= cart_line_item.product.name %></td>
+					<td><%= cart_line_item.product.price %></td>
+					<td><%= cart_line_item.quantity %></td>
+					<td><%= cart_line_item.product.price * cart_line_item.quantity %></td>
+
+					<% sum += cart_line_item.product.price * cart_line_item.quantity %>
+
+					<td><%= link_to "remove", cart_line_item_path(cart_line_item.id), method: :delete, data: { confirm: "Are you sure to remove the product from the cart?"} %></td>
+				</tr>
+				<% end %>
+			</tbody>
+		</table>
+		<h3> Total : <%= sum %></h3>
+	</div>
+
+	<div class="col-md-4">
+
+	</div>
+
+	<div class="col-md-4">
+		<div class="page-header">
+			<h3>Select Address</h3>
+		</div>
+
+
+
+		<%= form_for @order do |f| %>
+			<% @addresses.each do |address| %>
+				<%= f.radio_button :address_id, address.id %> <%= address.details %>
+			<% end %><br/><br/>
+			<%= f.submit "Chech out", class: "btn btn-primary" %>
+		<% end %>
+
+		<% end %>
+	</div>
+</div>
+
+
+
+		<%= link_to "continue shopping", products_path, class: "btn btn-primary" %>
+
+</div>
